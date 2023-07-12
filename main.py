@@ -1,7 +1,4 @@
-import os
-import marshal
-import zlib
-import base64
+import os, marshal, zlib, base64
 
 def kompilasi_file():
     try:
@@ -46,9 +43,7 @@ def kompilasi_file():
                 return
 
         with open(nama_file_keluaran, 'w') as file_keluaran:
-            file_keluaran.write('# Dikompilasi oleh FII14\n# https://github.com/FII14/kompilasi-marshal\n\n')
-            file_keluaran.write('import base64, zlib, marshal\n')
-            file_keluaran.write(f'exec(marshal.loads(zlib.decompress(base64.b64decode({repr(data_base64)}))))\n')
+            file_keluaran.write(f"# Dikompilasi oleh FII14\n# https://github.com/FII14/kompilasi-marshal\n\nimport base64, zlib, marshal;exec(marshal.loads(zlib.decompress(base64.b64decode({repr(data_base64)}))))\n")
 
         print(f'File berhasil dikompilasi: {nama_file_keluaran}\n')
 
@@ -62,4 +57,4 @@ try:
     kompilasi_file()
 except KeyboardInterrupt:
     print('Proses kompilasi dibatalkan.')
-        
+    
