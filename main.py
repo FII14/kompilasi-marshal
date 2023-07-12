@@ -30,6 +30,8 @@ def kompilasi_file():
 
         # Menulis kode keluaran ke dalam file keluaran
         with open(nama_file_keluaran, 'w') as file_keluaran:
+            file_keluaran.write('# Dikompilasi oleh FII14\n')
+            file_keluaran.write('# https://github.com/FII14/kompilasi-marshal\n\n')
             file_keluaran.write('import marshal\n')
             file_keluaran.write(f'exec(marshal.loads({repr(data_marshal)}))\n')
 
