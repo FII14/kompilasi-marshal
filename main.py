@@ -1,50 +1,65 @@
 import os
 import marshal
+import zlib
+import base64
 
 def kompilasi_file():
-    # Meminta lokasi file dan nama file keluaran dari pengguna
-    lokasi_file = input('Masukkan lokasi file Anda: ')
-    nama_file_keluaran = input('Masukkan nama file keluaran: ')
+    try:
+        lokasi_file = input('Masukkan lokasi file Anda: ')
+    except KeyboardInterrupt:
+        print('Proses kompilasi dibatalkan.')
+        return
 
-    # Memastikan ekstensi file keluaran adalah .py
+    try:
+        nama_file_keluaran = input('Masukkan nama file keluaran: ')
+    except KeyboardInterrupt:
+        print('Proses kompilasi dibatalkan.')
+        return
+
     if not nama_file_keluaran.endswith('.py'):
         nama_file_keluaran += '.py'
 
     try:
-        # Membaca isi file sumber
         with open(lokasi_file, 'r') as file_sumber:
             kode_sumber = file_sumber.read()
 
-        # Melakukan kompilasi kode sumber menjadi objek kode kompilasi
         kode_kompilasi = compile(kode_sumber, '', 'exec')
 
-        # Melakukan marshal (serialisasi) terhadap objek kode kompilasi
-        data_marshal = marshal.dumps(kode_kompilasi)
-
-        # Memeriksa apakah file keluaran sudah ada
-        if os.path.exists(nama_file_keluaran):
-            pilihan = input(f'File {nama_file_keluaran} sudah ada. Apakah Anda ingin menimpanya? (y/n): ')
-            if pilihan.lower() != 'y':
+        for i in range(14):
+            try:
+                data_marshal = marshal.dumps(kode_kompilasi)
+                data_kompresi = zlib.compress(data_marshal)
+                data_base64 = base64.b64encode(data_kompresi)
+                kode_kompilasi = marshal.loads(zlib.decompress(base64.b64decode(data_base64)))
+            except KeyboardInterrupt:
                 print('Proses kompilasi dibatalkan.')
                 return
 
-        # Menulis kode keluaran ke dalam file keluaran
-        with open(nama_file_keluaran, 'w') as file_keluaran:
-            file_keluaran.write('# Dikompilasi oleh FII14\n')
-            file_keluaran.write('# https://github.com/FII14/kompilasi-marshal\n\n')
-            file_keluaran.write('import marshal\n')
-            file_keluaran.write(f'exec(marshal.loads({repr(data_marshal)}))\n')
+        if os.path.exists(nama_file_keluaran):
+            try:
+                pilihan = input(f'File {nama_file_keluaran} sudah ada. Apakah Anda ingin menimpanya? (y/n): ')
+                if pilihan.lower() != 'y':
+                    print('Proses kompilasi dibatalkan.')
+                    return
+            except KeyboardInterrupt:
+                print('Proses kompilasi dibatalkan.')
+                return
 
-        # Menampilkan pesan berhasil jika proses kompilasi selesai
+        with open(nama_file_keluaran, 'w') as file_keluaran:
+            file_keluaran.write('# Dikompilasi oleh FII14\n# https://github.com/FII14/kompilasi-marshal\n\n')
+            file_keluaran.write('import base64, zlib, marshal\n')
+            file_keluaran.write(f'exec(marshal.loads(zlib.decompress(base64.b64decode({repr(data_base64)}))))\n')
+
         print(f'File berhasil dikompilasi: {nama_file_keluaran}\n')
 
     except FileNotFoundError:
-        # Menangani kesalahan jika file sumber tidak ditemukan
-        print('File tidak ditemukan. Pastikan lokasi file yang Anda masukkan benar.')
+        print(f'File tidak ditemukan: {lokasi_file}. Pastikan lokasi file yang Anda masukkan benar.')
 
     except Exception as e:
-        # Menangani kesalahan umum dan menampilkan pesan kesalahan
         print(f'Terjadi kesalahan: {str(e)}')
 
-# Memanggil fungsi kompilasi_file untuk menjalankan proses kompilasi
-kompilasi_file()
+try:
+    kompilasi_file()
+except KeyboardInterrupt:
+    print('Proses kompilasi dibatalkan.')
+        
