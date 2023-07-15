@@ -47,11 +47,11 @@ def compile_file():
 
         with open(output_file_name, 'w') as output_file:
             output_file.write(
-                f"#-------------------------------------------------"
+                f"#-------------------------------------------------\n"
                 f"#!/usr/bin/env python\n"
                 f"# Compiled by FII14\n"
                 f"# https://github.com/FII14/PSP\n"
-                f"#-------------------------------------------------\nn"
+                f"#-------------------------------------------------\n\n"
                 f"import base64, zlib, marshal\n"
                 f"exec(marshal.loads(zlib.decompress(base64.b64decode({repr(encoded_data)}))))\n"
             )
