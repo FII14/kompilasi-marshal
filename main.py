@@ -1,60 +1,70 @@
-import os, marshal, zlib, base64
+import os
+import marshal
+import zlib
+import base64
 
-def kompilasi_file():
+def compile_file():
     try:
-        lokasi_file = input('Masukkan lokasi file Anda: ')
+        file_location = input('Enter your file location: ')
     except KeyboardInterrupt:
-        print('Proses kompilasi dibatalkan.')
+        print('Compilation process canceled.')
         return
 
     try:
-        nama_file_keluaran = input('Masukkan nama file keluaran: ')
+        output_file_name = input('Enter the output file name: ')
     except KeyboardInterrupt:
-        print('Proses kompilasi dibatalkan.')
+        print('Compilation process canceled.')
         return
 
-    if not nama_file_keluaran.endswith('.py'):
-        nama_file_keluaran += '.py'
+    if not output_file_name.endswith('.py'):
+        output_file_name += '.py'
 
     try:
-        with open(lokasi_file, 'r') as file_sumber:
-            kode_sumber = file_sumber.read()
+        with open(file_location, 'r') as source_file:
+            source_code = source_file.read()
 
-        kode_kompilasi = compile(kode_sumber, '', 'exec')
+        compiled_code = compile(source_code, '', 'exec')
 
         for i in range(14):
             try:
-                data_marshal = marshal.dumps(kode_kompilasi)
-                data_kompresi = zlib.compress(data_marshal)
-                data_base64 = base64.b64encode(data_kompresi)
-                kode_kompilasi = marshal.loads(zlib.decompress(base64.b64decode(data_base64)))
+                data_marshal = marshal.dumps(compiled_code)
+                compressed_data = zlib.compress(data_marshal)
+                encoded_data = base64.b64encode(compressed_data)
+                compiled_code = marshal.loads(zlib.decompress(base64.b64decode(encoded_data)))
             except KeyboardInterrupt:
-                print('Proses kompilasi dibatalkan.')
+                print('Compilation process canceled.')
                 return
 
-        if os.path.exists(nama_file_keluaran):
+        if os.path.exists(output_file_name):
             try:
-                pilihan = input(f'File {nama_file_keluaran} sudah ada. Apakah Anda ingin menimpanya? (y/n): ')
-                if pilihan.lower() != 'y':
-                    print('Proses kompilasi dibatalkan.')
+                choice = input(f'File {output_file_name} already exists. Do you want to overwrite it? (y/n): ')
+                if choice.lower() != 'y':
+                    print('Compilation process canceled.')
                     return
             except KeyboardInterrupt:
-                print('Proses kompilasi dibatalkan.')
+                print('Compilation process canceled.')
                 return
 
-        with open(nama_file_keluaran, 'w') as file_keluaran:
-            file_keluaran.write(f"# Dikompilasi oleh FII14\n# https://github.com/FII14/kompilasi-marshal\n\nimport base64, zlib, marshal;exec(marshal.loads(zlib.decompress(base64.b64decode({repr(data_base64)}))))\n")
+        with open(output_file_name, 'w') as output_file:
+            output_file.write(
+                f"#-------------------------------------------------"
+                f"#!/usr/bin/env python\n"
+                f"# Compiled by FII14\n"
+                f"# https://github.com/FII14/PSP\n\n"
+                f"#-------------------------------------------------"
+                f"import base64, zlib, marshal\n"
+                f"exec(marshal.loads(zlib.decompress(base64.b64decode({repr(encoded_data)}))))\n"
+            )
 
-        print(f'File berhasil dikompilasi: {nama_file_keluaran}\n')
+        print(f'File successfully compiled: {output_file_name}\n')
 
     except FileNotFoundError:
-        print(f'File tidak ditemukan: {lokasi_file}. Pastikan lokasi file yang Anda masukkan benar.')
+        print(f'File not found: {file_location}. Please make sure you enter the correct file location.')
 
     except Exception as e:
-        print(f'Terjadi kesalahan: {str(e)}')
+        print(f'An error occurred: {str(e)}')
 
 try:
-    kompilasi_file()
+    compile_file()
 except KeyboardInterrupt:
-    print('Proses kompilasi dibatalkan.')
-    
+    print('Compilation process canceled.')
