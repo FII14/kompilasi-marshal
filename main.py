@@ -50,8 +50,8 @@ def compile_file():
                 f"#-------------------------------------------------"
                 f"#!/usr/bin/env python\n"
                 f"# Compiled by FII14\n"
-                f"# https://github.com/FII14/PSP\n\n"
-                f"#-------------------------------------------------"
+                f"# https://github.com/FII14/PSP\n"
+                f"#-------------------------------------------------\nn"
                 f"import base64, zlib, marshal\n"
                 f"exec(marshal.loads(zlib.decompress(base64.b64decode({repr(encoded_data)}))))\n"
             )
